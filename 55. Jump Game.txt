@@ -1,0 +1,20 @@
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int max_ind=nums[0];
+        
+        for(int i=1;i<nums.size()-1;i++){
+            if(i<=max_ind){
+            int temp=i+nums[i];
+            max_ind=max(max_ind,temp);
+            }
+            else{
+                return false;
+            }
+            
+        }
+        if(max_ind>=nums.size()-1) return true;
+        return false;
+        
+    }
+};
