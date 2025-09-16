@@ -1,0 +1,30 @@
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+    if(digits.empty()) return {};
+
+    vector<string> keypad = {"","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+    vector<string>result={""};
+
+    for(char digit:digits){
+        int num=digit-'0';
+        vector<string>temp;
+        for(auto prefix:result){
+            for(auto c:keypad[num]){
+                temp.push_back(prefix+c);
+            }
+        }
+        result=temp;
+    }
+    return result;
+    }
+};
+
+
+
+
+
+
+
+
+// Que Link : https://leetcode.com/problems/letter-combinations-of-a-phone-number/?envType=study-plan-v2&envId=top-100-liked
