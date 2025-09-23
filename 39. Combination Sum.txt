@@ -1,0 +1,57 @@
+class Solution {
+private:
+    void backtrack(vector<int>&candidates,int target,vector<vector<int>>&result,vector<int>&temp,int sum,int k){
+         if(sum==target) result.push_back(temp);
+         if(sum>target) return;
+        for(int j=k;j<candidates.size();j++){
+            vector<int>prev=temp;
+            prev.push_back(candidates[j]);
+            int value=sum;
+            value +=candidates[j];
+            backtrack(candidates,target,result,prev,value,j);
+        }
+    }
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>>result;
+        for(int i=0;i<candidates.size();i++){
+             vector<int>temp;
+             int sum=candidates[i];
+             temp.push_back(candidates[i]);
+            backtrack(candidates,target,result,temp,sum,i);
+        }
+        
+        return result;
+
+
+    }
+};
+
+
+
+
+// Optimal 
+
+class Solution {
+public:
+    void backtrack(vector<int>& candidates, int target, vector<vector<int>>& result, vector<int>& temp, int start) {
+        if (target == 0) {
+            result.push_back(temp);
+            return;
+        }
+        for (int i = start; i < candidates.size(); ++i) {
+            if (candidates[i] > target) break;                                      // Prune if value is too large
+            temp.push_back(candidates[i]);
+            backtrack(candidates, target - candidates[i], result, temp, i);         // not i+1 because unlimited uses
+            temp.pop_back();
+        }
+    }
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        sort(candidates.begin(), candidates.end());                                 // Optional: helps with early stopping
+        vector<vector<int>> result;
+        vector<int> temp;
+        backtrack(candidates, target, result, temp, 0);
+        return result;
+    }
+};
