@@ -1,0 +1,48 @@
+class Solution {
+public:
+    string fractionToDecimal(int numerator, int denominator) {
+        if(numerator==0) return "0";
+        string res;
+        if((numerator<0)^(denominator<0)) res+="-";
+
+
+        long long n=abs((long long)numerator);
+        long long d=abs((long long)denominator);
+        res+=to_string(n/d);
+        long long r=n%d;
+        if(r==0)return res;
+
+        res +=".";
+        unordered_map<long long ,int> seen;
+        while(r!=0){                              
+            if(seen.count(r)){                              // Detect repeating cycle using a map
+                res.insert(seen[r],"(");
+                res += ")";
+                break;
+            }
+            seen[r]=res.size();
+            r*=10;
+            res+=to_string(r/d);
+            r %=d;
+
+        }
+        return res;
+    }
+};
+
+
+
+
+Ex .
+Example 1:
+
+Input: numerator = 1, denominator = 2
+Output: "0.5"
+Example 2:
+
+Input: numerator = 2, denominator = 1
+Output: "2"
+Example 3:
+
+Input: numerator = 4, denominator = 333
+Output: "0.(012)"
