@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int drink(int numBottles,int numExchange,int sum){
+        if(numBottles<numExchange) return sum;
+         while(numBottles>=numExchange){
+             int temp=0;
+            while(numBottles>=numExchange){
+                temp++;
+                numBottles -=numExchange;
+                numExchange++;
+            }
+            numBottles +=temp;
+            sum+=temp;
+         }
+          
+         return sum;
+    } 
+    int maxBottlesDrunk(int numBottles, int numExchange) {
+        int sum = numBottles;
+       return  drink(numBottles,numExchange,sum);
+    }
+};
+
+
