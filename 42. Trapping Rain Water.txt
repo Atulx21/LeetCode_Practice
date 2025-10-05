@@ -1,0 +1,46 @@
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int n=height.size();
+        if (n==0) return 0;   
+        int result = 0, bar = 0, partial = 0;
+        int j= 0; 
+        while (j< n && height[j] == 0) j++;
+        if (j==n) return 0;   
+        bar = height[j];
+        for (int i = j; i < n; i++) {
+            if (height[i] >= bar) {
+                result += partial;
+                bar = height[i];
+                partial = 0;
+            }
+            partial += bar - height[i];
+        }
+        bar = 0;
+        j = (n - 1);
+        partial = 0;
+        while (j >= 0 && height[j] == 0) j--;
+        if (j < 0) return result;   
+        bar = height[j];
+        for (int k = j - 1; k >= 0; k--) {
+            if (height[k] > bar) {  
+                result += partial;
+                bar = height[k];
+                partial = 0;
+            }
+            partial += bar - height[k];
+        }
+        return result;
+    }
+};
+
+
+
+
+Example :
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+
+Example :
+Input: height = [4,2,0,3,2,5]
+Output: 9
