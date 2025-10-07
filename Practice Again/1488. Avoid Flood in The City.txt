@@ -1,0 +1,45 @@
+class Solution {
+public:
+    vector<int> avoidFlood(vector<int>& rains) {
+        int n = rains.size();
+        unordered_map<int, int> lakeToLastRain;
+        set<int> dryDays;
+        vector<int> res(n, 1);
+
+        for(int i = 0; i < n; i++) {
+            int lake = rains[i];
+            if (lake == 0) {
+                dryDays.insert(i);
+            } else {
+                res[i] = -1;
+                if (lakeToLastRain.count(lake)) {
+                    auto it = dryDays.lower_bound(lakeToLastRain[lake]);
+                    if (it == dryDays.end()) {
+                        return {};
+                    }
+                    res[*it] = lake;
+                    dryDays.erase(it);
+                }
+                lakeToLastRain[lake] = i;
+            }
+        }
+        return res;
+    }
+};
+
+
+
+
+
+
+Example 1:
+Input: rains = [1,2,3,4]
+Output: [-1,-1,-1,-1]
+
+Example 2:
+Input: rains = [1,2,0,0,2,1]
+Output: [-1,-1,2,1,-1,-1]
+
+Example 3:
+Input: rains = [1,2,0,1,2]
+Output: []
