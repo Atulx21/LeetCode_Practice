@@ -1,0 +1,34 @@
+class Solution {
+public:
+    long long minTime(vector<int>& skill, vector<int>& mana) {
+        long long totalSkill = 0;
+        for (int s : skill) totalSkill += s;
+
+        long long finishTime = totalSkill * mana[0];
+        for (int j = 1; j < mana.size(); j++) {
+            long long tempTime = finishTime;
+            for (int i = skill.size() - 2; i >= 0; i--) {
+                tempTime -= (long long)skill[i + 1] * mana[j - 1];
+                finishTime = max(tempTime, finishTime - (long long)skill[i] * mana[j]);
+            }
+            finishTime += totalSkill * mana[j];
+        }
+        return finishTime;
+    }
+};
+
+
+
+
+
+
+
+
+
+Example 1:
+Input: skill = [1,5,2,4], mana = [5,1,4,2]
+Output: 110
+
+Example 2:
+Input: skill = [1,1,1], mana = [1,1,1]
+Output: 5
