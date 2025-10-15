@@ -1,0 +1,118 @@
+class Solution {
+public:
+    const int MOD = 1e9 + 7;
+
+    long long power(long long base, long long exp) {
+        long long res = 1;
+        base %= MOD;
+        while (exp > 0) {
+            if (exp % 2 == 1) res = (res * base) % MOD;
+            base = (base * base) % MOD;
+            exp /= 2;
+        }
+        return res;
+    }
+
+    long long modInverse(long long n) {
+        return power(n, MOD - 2);
+    }
+
+    int magicalSum(int m, int k, vector<int>& nums) {
+        int n = nums.size();
+        if (m < k) {
+            return 0;
+        }
+
+        vector<long long> fact(m + 1);
+        vector<long long> invFact(m + 1);
+        fact[0] = 1;
+        invFact[0] = 1;
+        for (int i = 1; i <= m; ++i) {
+            fact[i] = (fact[i - 1] * i) % MOD;
+            invFact[i] = modInverse(fact[i]);
+        }
+        
+        vector<vector<long long>> pows(n, vector<long long>(m + 1));
+        for (int i = 0; i < n; ++i) {
+            pows[i][0] = 1;
+            for (int c = 1; c <= m; ++c) {
+                pows[i][c] = (pows[i][c - 1] * nums[i]) % MOD;
+            }
+        }
+
+        vector<vector<long long>> terms(n, vector<long long>(m + 1));
+        for (int i = 0; i < n; ++i) {
+            for (int c = 0; c <= m; ++c) {
+                terms[i][c] = (pows[i][c] * invFact[c]) % MOD;
+            }
+        }
+        
+        vector<int> popcounts(m + 1);
+        for(int i = 0; i <= m; ++i) {
+            popcounts[i] = __builtin_popcount(i);
+        }
+
+        int max_carry_sum = m - k;
+        vector<vector<vector<long long>>> dp(m + 1, vector<vector<long long>>(m + 1, vector<long long>(max_carry_sum + 1, 0)));
+        
+        dp[0][0][0] = 1;
+
+        for (int j = 0; j < n; ++j) {
+            vector<vector<vector<long long>>> next_dp(m + 1, vector<vector<long long>>(m + 1, vector<long long>(max_carry_sum + 1, 0)));
+            for (int used_m = 0; used_m <= m; ++used_m) {
+                for (int prev_carry = 0; prev_carry <= m; ++prev_carry) {
+                    for (int carry_s = 0; carry_s <= max_carry_sum; ++carry_s) {
+                        if (dp[used_m][prev_carry][carry_s] == 0) continue;
+                        
+                        long long current_val = dp[used_m][prev_carry][carry_s];
+                        
+                        for (int c = 0; c <= m - used_m; ++c) {
+                            int next_carry = (c + prev_carry) / 2;
+                            int next_carry_s = carry_s + next_carry;
+
+                            if (next_carry <= m && next_carry_s <= max_carry_sum) {
+                                next_dp[used_m + c][next_carry][next_carry_s] = 
+                                    (next_dp[used_m + c][next_carry][next_carry_s] + current_val * terms[j][c]) % MOD;
+                            }
+                        }
+                    }
+                }
+            }
+            dp = move(next_dp);
+        }
+
+        long long sum_of_terms = 0;
+        for (int final_carry = 0; final_carry <= m; ++final_carry) {
+            for (int carry_s = 0; carry_s <= max_carry_sum; ++carry_s) {
+                if (carry_s + final_carry - popcounts[final_carry] == max_carry_sum) {
+                    sum_of_terms = (sum_of_terms + dp[m][final_carry][carry_s]) % MOD;
+                }
+            }
+        }
+        
+        long long final_ans = (sum_of_terms * fact[m]) % MOD;
+        return (int)final_ans;
+    }
+};
+
+
+
+
+
+
+
+
+
+Example 1:
+Input: m = 5, k = 5, nums = [1,10,100,10000,1000000]
+Output: 991600007
+
+
+Example 2:
+Input: m = 2, k = 2, nums = [5,4,3,2,1]
+Output: 170
+
+
+Example 3:
+Input: m = 1, k = 1, nums = [28]
+Output: 28
