@@ -1,0 +1,49 @@
+class Solution {
+public:
+    string addOperation(string s, int a) {
+        for (int i = 1; i < s.size(); i += 2)
+            s[i] = '0' + (s[i] - '0' + a) % 10;
+        return s;
+    }
+
+    string rotateOperation(string s, int b) {
+        int n = s.size();
+        rotate(s.begin(), s.begin() + (n - b), s.end());
+        return s;
+    }
+
+    string findLexSmallestString(string s, int a, int b) {
+        queue<string> q;
+        unordered_set<string> vis;
+        string ans = s;
+        q.push(s);
+        vis.insert(s);
+        while (!q.empty()) {
+            string cur = q.front(); q.pop();
+            ans = min(ans, cur);
+
+            string t1 = addOperation(cur, a);
+            if (!vis.count(t1)) {
+                vis.insert(t1);
+                q.push(t1);
+            }
+
+            string t2 = rotateOperation(cur, b);
+            if (!vis.count(t2)) {
+                vis.insert(t2);
+                q.push(t2);
+            }
+        }
+        return ans;
+    }
+};
+
+
+
+
+
+
+Example 1:
+
+Input: s = "5525", a = 9, b = 2
+Output: "2050"
