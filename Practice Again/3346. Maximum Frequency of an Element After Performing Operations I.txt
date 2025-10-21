@@ -1,0 +1,50 @@
+class Solution {
+public:
+    int maxFrequency(vector<int>& nums, int k, int numOperations) {
+        sort(nums.begin(), nums.end());
+        
+        set<long long> candidates;
+        for (int num : nums) {
+            candidates.insert((long long)num);
+            candidates.insert((long long)num - k);
+            candidates.insert((long long)num + k);
+        }
+        
+        int max_freq = 0;
+        
+        for (long long target : candidates) {
+            
+            auto it1 = lower_bound(nums.begin(), nums.end(), target);
+            auto it2 = upper_bound(nums.begin(), nums.end(), target);
+            int n_equal = distance(it1, it2);
+            
+            auto it_low = lower_bound(nums.begin(), nums.end(), target - k);
+            auto it_high = upper_bound(nums.begin(), nums.end(), target + k);
+            int count_in_range = distance(it_low, it_high);
+            
+            int n_changeable = count_in_range - n_equal;
+            
+            int current_freq = n_equal + min(n_changeable, numOperations);
+            
+            max_freq = max(max_freq, current_freq);
+        }
+        
+        return max_freq;
+    }
+};
+
+
+
+
+
+
+
+
+Example 1:
+Input: nums = [1,4,5], k = 1, numOperations = 2
+Output: 2
+
+
+Example 2:
+Input: nums = [5,11,20,20], k = 5, numOperations = 1
+Output: 2
