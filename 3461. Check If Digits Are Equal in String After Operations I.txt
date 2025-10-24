@@ -1,0 +1,28 @@
+class Solution {
+public:
+    bool hasSameDigits(string s) {
+        while (s.size() > 2) {
+            string res;
+            for (size_t i = 0; i + 1 < s.size(); ++i) {
+                res += ((s[i] - '0') + (s[i+1] - '0')) % 10 + '0';          // directly append char
+            }
+            s = move(res);                                                  // move instead of copy for efficiency
+        }
+        return s.size() == 2 && s[0] == s[1];
+    }
+};
+
+
+
+
+
+
+
+
+Example 1:
+Input: s = "3902"
+Output: true
+
+Example 2:
+Input: s = "34789"
+Output: false
