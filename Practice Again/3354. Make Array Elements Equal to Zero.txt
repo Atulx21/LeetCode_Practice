@@ -1,0 +1,55 @@
+class Solution {
+public:
+    int countValidSelections(vector<int>& nums) {
+        int n = nums.size();
+        int res = 0;
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] == 0) {
+                vector<int> arr = nums;
+                int curr = i, dir = 1;
+                bool valid = true;
+                while (curr >= 0 && curr < n) {
+                    if (arr[curr] == 0) {
+                        curr += dir;
+                    } else if (arr[curr] > 0) {
+                        arr[curr]--;
+                        dir = -dir;
+                        curr += dir;
+                    }
+                }
+                for (int v : arr) {
+                    if (v != 0) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid) res++;
+                arr = nums;
+                curr = i; dir = -1;
+                valid = true;
+                while (curr >= 0 && curr < n) {
+                    if (arr[curr] == 0) {
+                        curr += dir;
+                    } else if (arr[curr] > 0) {
+                        arr[curr]--;
+                        dir = -dir;
+                        curr += dir;
+                    }
+                }
+                for (int v : arr) {
+                    if (v != 0) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid) res++;
+            }
+        }
+        return res;
+    }
+};
+
+
+Example 1:
+Input: nums = [1,0,2,0,3]
+Output: 2
