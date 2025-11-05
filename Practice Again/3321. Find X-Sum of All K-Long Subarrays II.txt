@@ -1,0 +1,99 @@
+class Solution {
+public:
+    vector<long long> findXSum(vector<int>& nums, int k, int x) {
+        int n = nums.size();
+        unordered_map<int, int> freq;
+        auto cmp = [](const pair<int,int>& a, const pair<int,int>& b) {
+            if (a.first == b.first) return a.second < b.second;
+            return a.first < b.first;
+        };
+        multiset<pair<int,int>, decltype(cmp)> top(cmp), rest(cmp);
+        long long sumTop = 0;
+
+        std::function<void()> balance;
+
+        auto add = [&](int val) {
+            int f = freq[val]++;
+            if (f > 0) {
+                if (top.count({f, val})) {
+                    top.erase(top.find({f, val}));
+                    sumTop -= (long long) val * f;
+                } else {
+                    rest.erase(rest.find({f, val}));
+                }
+            }
+            int newF = freq[val];
+            rest.insert({newF, val});
+            balance();
+        };
+
+        auto remove = [&](int val) {
+            int f = freq[val];
+            if (top.count({f, val})) {
+                top.erase(top.find({f, val}));
+                sumTop -= (long long) val * f;
+            } else {
+                rest.erase(rest.find({f, val}));
+            }
+            freq[val]--;
+            int newF = freq[val];
+            if (newF > 0) rest.insert({newF, val});
+            balance();
+        };
+
+        balance = [&]() {
+            while ((int)top.size() < x && !rest.empty()) {
+                auto it = prev(rest.end());
+                sumTop += (long long) it->second * it->first;
+                top.insert(*it);
+                rest.erase(it);
+            }
+            while (!top.empty() && !rest.empty()) {
+                auto itTop = top.begin();
+                auto itRest = prev(rest.end());
+                if (cmp(*itTop, *itRest)) {
+                    sumTop -= (long long) itTop->second * itTop->first;
+                    sumTop += (long long) itRest->second * itRest->first;
+                    rest.insert(*itTop);
+                    top.insert(*itRest);
+                    rest.erase(itRest);
+                    top.erase(itTop);
+                } else {
+                    break;
+                }
+            }
+        };
+
+        vector<long long> ans;
+        for (int i = 0; i < k; ++i) add(nums[i]);
+        ans.push_back(sumTop);
+        for (int i = k; i < n; ++i) {
+            remove(nums[i-k]);
+            add(nums[i]);
+            ans.push_back(sumTop);
+        }
+        return ans;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+Example 1:
+
+Input: nums = [1,1,2,2,3,4,2,3], k = 6, x = 2
+Output: [6,10,12]
+
+
+
+Example 2:
+
+Input: nums = [3,8,7,8,7,5], k = 2, x = 2
+Output: [11,15,15,15,12]

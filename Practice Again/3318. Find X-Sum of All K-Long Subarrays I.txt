@@ -1,0 +1,72 @@
+class Solution {
+public:
+    vector<int> findXSum(vector<int>& nums, int k, int x) {
+        vector<int> result;
+        int n = nums.size();
+        for (int i = 0; i <= n - k; i++) {
+            // Count frequencies in the subarray
+            unordered_map<int, int> freq;
+            for (int j = i; j < i + k; j++) {
+                freq[nums[j]]++;
+            }
+            // Store frequency and value pairs
+            vector<pair<int, int>> freqPairs;
+            for (auto& p : freq) {
+                freqPairs.push_back({p.second, p.first});
+            }
+            // Sort by frequency descending, then by value descending
+            sort(freqPairs.begin(), freqPairs.end(), [](auto &a, auto &b) {
+                if (a.first == b.first)
+                    return a.second > b.second;
+                return a.first > b.first;
+            });
+            // Select top x values
+            unordered_set<int> selected;
+            for (int j = 0; j < min(x, (int)freqPairs.size()); j++) {
+                selected.insert(freqPairs[j].second);
+            }
+            // Calculate sum of selected values in the subarray
+            int sum = 0;
+            for (int j = i; j < i + k; j++) {
+                if (selected.count(nums[j])) {
+                    sum += nums[j];
+                }
+            }
+            result.push_back(sum);
+        }
+        return result;
+    }
+};
+
+
+
+
+
+
+Optimize :
+
+
+class Solution {
+public:
+    vector<int> findXSum(vector<int>& nums, int k, int x) {
+        int n = nums.size();
+        vector<int> answer;
+        for (int i = 0; i <= n - k; ++i) {
+            unordered_map<int, int> freq;
+            for (int j = i; j < i + k; ++j) freq[nums[j]]++;
+            vector<pair<int, int>> items;
+            for (auto& [num, count] : freq) items.push_back({count, num});
+            sort(items.begin(), items.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
+                if (a.first == b.first) return a.second > b.second;
+                return a.first > b.first;
+            });
+            unordered_set<int> keep;
+            for (int t = 0; t < min(x, (int)items.size()); ++t) keep.insert(items[t].second);
+            int sum = 0;
+            for (int j = i; j < i + k; ++j)
+                if (keep.count(nums[j])) sum += nums[j];
+            answer.push_back(sum);
+        }
+        return answer;
+    }
+};
