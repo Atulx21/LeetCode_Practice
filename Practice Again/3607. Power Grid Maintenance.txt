@@ -1,0 +1,79 @@
+class UnionFind {
+public:
+    vector<int> parent, size;
+    vector<priority_queue<int, vector<int>, greater<int>>> onlinePQ;
+
+    UnionFind(int n) : parent(n+1), size(n+1, 1), onlinePQ(n+1) {
+        for (int i = 1; i <= n; ++i) {
+            parent[i] = i;
+            onlinePQ[i].push(i);
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    void unite(int a, int b) {
+        a = find(a);
+        b = find(b);
+        if (a != b) {
+            if (size[a] < size[b]) swap(a, b);
+            parent[b] = a;
+            size[a] += size[b];
+            while (!onlinePQ[b].empty()) {
+                onlinePQ[a].push(onlinePQ[b].top());
+                onlinePQ[b].pop();
+            }
+        }
+    }
+
+    int get_min_online(int x, const vector<bool>& isOnline) {
+        int root = find(x);
+        while (!onlinePQ[root].empty() && !isOnline[onlinePQ[root].top()]) {
+            onlinePQ[root].pop();
+        }
+        if (onlinePQ[root].empty()) return -1;
+        return onlinePQ[root].top();
+    }
+};
+
+class Solution {
+public:
+    vector<int> processQueries(int c, vector<vector<int>>& connections, vector<vector<int>>& queries) {
+        UnionFind uf(c);
+        vector<bool> isOnline(c+1, true);
+        for (auto &conn : connections) {
+            uf.unite(conn[0], conn[1]);
+        }
+        vector<int> res;
+        for (auto &q : queries) {
+            int t = q[0], x = q[1];
+            if (t == 1) {
+                if (isOnline[x]) {
+                    res.push_back(x);
+                } else {
+                    res.push_back(uf.get_min_online(x, isOnline));
+                }
+            } else {
+                isOnline[x] = false;
+            }
+        }
+        return res;
+    }
+};
+
+
+
+Example 1:
+
+Input: c = 5, connections = [[1,2],[2,3],[3,4],[4,5]], queries = [[1,3],[2,1],[1,1],[2,2],[1,2]]
+Output: [3,2,3]
+
+
+Example 2:
+
+Input: c = 3, connections = [], queries = [[1,1],[2,1],[1,1]]
+Output: [1,-1]
